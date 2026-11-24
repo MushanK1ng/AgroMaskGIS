@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>田块空间分析台 | AgroMask GIS</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <script src="{{ url_for('static', filename='workbench.js') }}" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="top-inner">
+      <a class="brand" href="/" aria-label="AgroMask GIS 首页"><span class="brand-icon" aria-hidden="true"></span>AgroMask <strong>GIS</strong></a>
+      <nav aria-label="页面导航"><a href="#workspace">空间分析</a><a href="#statistics">面积统计</a><a href="#exports">成果导出</a></nav>
+      <span class="local"><i></i> 本地工作台</span>
+    </div>
+  </header>
+
+  <main id="workspace">
+    <section class="intro" aria-labelledby="title">
+      <div><h1 id="title">田块空间分析台</h1><p>将农业遥感模型的掩膜切片还原为带坐标的斑块，并生成面积统计和专题图。</p></div>
+      <span id="source-badge" class="source-badge">模拟数据 · 玉米倒伏</span>
+    </section>
+
+    <div class="workspace-grid">
+      <aside class="panel setup" aria-labelledby="setup-title">
+        <h2 id="setup-title">转换设置</h2>
+        <form id="convert-form">
+          <fieldset>
+            <legend>数据来源</legend>
+            <label class="choice" id="demo-choice"><input type="radio" name="mode" value="demo" checked><span><strong>玉米倒伏演示</strong><small>模拟正射图与 24 张掩膜切片</small></span></label>
+            <label class="choice"><input type="radio" name="mode" value="upload"><span><strong>导入我的项目</strong><small>参考 GeoTIFF 与分类掩膜</small></span></label>
+          </fieldset>
+          <div id="upload-area" hidden>
+            <label class="folder-label" for="folder">选择项目文件夹</label>
+            <input id="folder" type="file" webkitdirectory multiple>
+            <p id="selection" class="hint" aria-live="polite">包含参考图、掩膜及可选 CSV 配置。</p>
+            <details><summary>查看文件格式</summary><p>参考图建议名为 <code>reference.tif</code>。切片用 <code>mask_x160_y0.png</code> 格式，x、y 是列、行像素偏移。也可用 <code>tiles.csv</code> 指定 <code>filename,x,y</code>。可选 <code>classes.csv</code>，列为 <code>value,name,color</code>。</p></details>
+          </div>
+          <div class="parameters">
+            <label for="threshold">最小斑块面积</label>
+            <div class="number-field"><input type="number" id="threshold" name="threshold" required min="0" max="1000000000000" step="any" value="10" aria-describedby="threshold-hint"><span>m²</span></div>
+            <p id="threshold-hint" class="hint">面积小于阈值的斑块将被筛除，0 表示保留全部。</p>
+            <label for="background" class="background-label">背景类别值</label>
+            <input type="number" id="background" name="background" required min="0" max="65535" step="1" value="0" aria-describedby="background-hint">
+            <p id="background-hint" class="hint">选用内置样例或爱荷华真实案例时填 0。</p>
+          </div>
+          <button class="primary" id="run-button" type="submit"><span aria-hidden="true">▷</span> 开始转换</button>
+          <div id="run-state" class="run-state" role="status" aria-live="polite"></div>
+        </form>
+        <div class="stages"><h3>处理流程</h3><ol><li>校验与拼接切片</li><li>恢复坐标、提取斑块</li><li>按面积筛除碎斑</li><li>统计与导出</li></ol></div>
+      </aside>
+
+      <section class="panel map-panel" aria-labelledby="map-title">
+        <div class="panel-head">
+          <div><h2 id="map-title">空间预览</h2><p id="map-meta">读取演示影像…</p></div>
+          <div class="layers" aria-label="地图图层"><button data-layer="overlay" aria-pressed="true">结果叠加</button><button data-layer="reference" aria-pressed="false">参考影像</button><button data-layer="raw" aria-pressed="false">原始掩膜</button><button data-layer="filtered" aria-pressed="false">筛除结果</button></div>
+        </div>
+        <div class="map-frame" id="map-frame">
+          <div class="map-stage" id="map-stage" hidden><img id="map-image" alt="农业遥感掩膜与参考影像空间预览" draggable="false"></div>
+          <div class="map-tools" aria-label="地图缩放"><button id="zoom-in" aria-label="放大">+</button><button id="zoom-out" aria-label="缩小">−</button><button id="zoom-reset" aria-label="恢复初始视图">⌂</button></div>
+          <div id="legend" class="legend" hidden></div>
+        </div>
+        <div class="map-coordinate"><span id="map-position" aria-live="off">在影像上移动鼠标以查看坐标</span><span id="map-crs">—</span></div>
+        <div class="metrics" aria-label="转换结果摘要">
+          <div><span>掩膜切片</span><strong id="metric-tiles">—</strong><small> 张</small></div>
+          <div><span>保留斑块</span><strong id="metric-kept">—</strong><small> 个</small></div>
+          <div><span>筛除斑块</span><strong id="metric-removed">—</strong><small> 个</small></div>
+          <div><span>有效总面积</span><strong id="metric-area">—</strong><small> 亩</small></div>
+        </div>
+      </section>
+    </div>
+
+    <section id="statistics" class="panel report" aria-labelledby="statistics-title">
+      <div class="panel-head"><div><h2 id="statistics-title">各类别面积</h2><p id="stat-context">有效面积占比按筛除后全部前景面积计算。</p></div><div id="chart-key" class="chart-key"><span>筛除前</span><span>筛除后</span></div></div>
+      <div class="report-grid">
+        <div id="chart" class="chart" aria-label="筛除前后面积对比"></div>
+        <div class="table-scroll"><table><thead><tr><th scope="col">类别</th><th scope="col">有效面积 (m²)</th><th scope="col">面积 (亩)</th><th scope="col">占比</th><th scope="col">保留</th><th scope="col">筛除</th></tr></thead><tbody id="class-table"></tbody></table></div>
+      </div>
+    </section>
+
+    <section id="exports" class="panel exports" aria-labelledby="export-title">
+      <div class="panel-head"><div><h2 id="export-title">成果导出</h2><p>可在 ArcGIS / QGIS 中叠加参考图，也可直接使用统计表和 PNG 图件。</p></div><a id="download-all" class="primary" hidden>下载全部成果</a></div>
+      <div id="downloads" class="downloads"></div>
+    </section>
+  </main>
+  <footer class="footer">AgroMask GIS <span>农业遥感推理结果后处理</span></footer>
+</body>
+</html>

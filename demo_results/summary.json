@@ -1,0 +1,68 @@
+{
+  "reference": "reference.tif",
+  "width": 960,
+  "height": 640,
+  "tiles": 24,
+  "crs": "EPSG:32650",
+  "projected": true,
+  "transform": [
+    0.5,
+    0.0,
+    492860.0,
+    0.0,
+    -0.5,
+    3921420.0
+  ],
+  "extent": [
+    492860.0,
+    3921100.0,
+    493340.0,
+    3921420.0
+  ],
+  "threshold": 10,
+  "background": 0,
+  "demo": true,
+  "area_method": "投影平面面积（换算为平方米）",
+  "classes": [
+    {
+      "class_id": 1,
+      "name": "轻度倒伏",
+      "color": "#FFB35F",
+      "raw_pixels": 45657,
+      "raw_m2": 11414.25,
+      "area_m2": 11342.25,
+      "kept": 8,
+      "removed": 46,
+      "area_mu": 17.013375,
+      "share": 0.5043802112284602
+    },
+    {
+      "class_id": 2,
+      "name": "中度倒伏",
+      "color": "#EC6E76",
+      "raw_pixels": 34926,
+      "raw_m2": 8731.5,
+      "area_m2": 8670.75,
+      "kept": 6,
+      "removed": 35,
+      "area_mu": 13.006125,
+      "share": 0.38558087826570314
+    },
+    {
+      "class_id": 3,
+      "name": "重度倒伏",
+      "color": "#72D7D1",
+      "raw_pixels": 10159,
+      "raw_m2": 2539.75,
+      "area_m2": 2474.5,
+      "kept": 4,
+      "removed": 32,
+      "area_mu": 3.7117500000000003,
+      "share": 0.11003891050583657
+    }
+  ],
+  "total_m2": 22487.5,
+  "total_mu": 33.73125,
+  "kept": 18,
+  "removed": 113
+}

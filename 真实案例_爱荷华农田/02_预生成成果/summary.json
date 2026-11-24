@@ -1,0 +1,56 @@
+{
+  "reference": "reference.tif",
+  "width": 1290,
+  "height": 970,
+  "tiles": 25,
+  "crs": "EPSG:5070",
+  "projected": true,
+  "transform": [
+    3.0,
+    0.0,
+    200205.0,
+    0.0,
+    -3.0,
+    2122815.0
+  ],
+  "extent": [
+    200205.0,
+    2119905.0,
+    204075.0,
+    2122815.0
+  ],
+  "threshold": 9000.0,
+  "background": 0,
+  "demo": false,
+  "area_method": "投影平面面积（换算为平方米）",
+  "classes": [
+    {
+      "class_id": 1,
+      "name": "玉米",
+      "color": "#FFC66D",
+      "raw_pixels": 633000,
+      "raw_m2": 5697000.0,
+      "area_m2": 5667300.0,
+      "kept": 14,
+      "removed": 23,
+      "area_mu": 8500.95,
+      "share": 0.595517306601097
+    },
+    {
+      "class_id": 5,
+      "name": "大豆",
+      "color": "#51D5DE",
+      "raw_pixels": 429700,
+      "raw_m2": 3867300.0,
+      "area_m2": 3849300.0,
+      "kept": 13,
+      "removed": 16,
+      "area_mu": 5773.950000000001,
+      "share": 0.40448269339890297
+    }
+  ],
+  "total_m2": 9516600.0,
+  "total_mu": 14274.900000000001,
+  "kept": 27,
+  "removed": 39
+}
